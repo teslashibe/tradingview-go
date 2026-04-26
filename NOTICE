@@ -1,0 +1,10 @@
+tradingview-go
+Copyright 2026 teslashibe
+
+Portions of the TradingView WebSocket protocol implementation in this
+package (message framing, payload encoding, candle parsing, and
+resolution mapping) are derived from gopher-lab/tradingview-go
+(https://github.com/gopher-lab/tradingview-go), which is also released
+under the MIT license. The original implementation is the source of
+record for protocol-level details that are not officially documented by
+TradingView.
