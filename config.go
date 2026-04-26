@@ -44,8 +44,12 @@ type Config struct {
 	// entries held in the LRU. Default: 256.
 	CacheSize int
 
-	// DisableCache short-circuits the cache layer entirely.
-	DisableCache bool
+	// EnableCache opts in to the TTL+LRU cache. Default off: for
+	// short-horizon trading the freshness loss (5s+ on the live bar)
+	// outweighs the per-call latency saved. Flip on if you observe
+	// duplicate fetches inside a single reasoning turn or hit
+	// upstream rate limits.
+	EnableCache bool
 
 	// UserAgent is sent with WebSocket and REST requests. Default: a
 	// generic Mozilla string (TradingView rejects programmatic UAs).

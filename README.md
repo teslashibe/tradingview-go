@@ -69,7 +69,8 @@ for _, m := range matches {
 | `PoolSize` | 8 | Max concurrent WebSocket connections; also caps `FetchMulti` parallelism. |
 | `FetchTimeout` | 20s | Per-fetch ceiling. |
 | `IdleConnTimeout` | 5m | Reap idle pooled conns. |
-| `CacheTTLs` | resolution-proportional | 1m=5s … 1D=30m. Set `DisableCache=true` to bypass. |
+| `EnableCache` | `false` | Off by default for freshest live bars. Flip on if duplicate fetches or rate limits become a problem. |
+| `CacheTTLs` | resolution-proportional | 1m=5s … 1D=30m. Only consulted when `EnableCache=true`. |
 | `CacheSize` | 256 | LRU entry cap. |
 
 ## Errors

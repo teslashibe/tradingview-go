@@ -36,7 +36,8 @@ func TestIntegrationFetchBTC(t *testing.T) {
 }
 
 func TestIntegrationCacheHit(t *testing.T) {
-	c := New(Config{}, nil)
+	// Cache is opt-in; this test verifies it works when enabled.
+	c := New(Config{EnableCache: true}, nil)
 	defer c.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -55,6 +56,26 @@ func TestIntegrationCacheHit(t *testing.T) {
 	}
 	if !b.Cached {
 		t.Error("second fetch should be cached")
+	}
+}
+
+func TestIntegrationCacheOffByDefault(t *testing.T) {
+	c := New(Config{}, nil)
+	defer c.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	a, err := c.Fetch(ctx, "BINANCE:SOLUSDT", "15", 20)
+	if err != nil {
+		t.Fatalf("fetch a: %v", err)
+	}
+	b, err := c.Fetch(ctx, "BINANCE:SOLUSDT", "15", 20)
+	if err != nil {
+		t.Fatalf("fetch b: %v", err)
+	}
+	if a.Cached || b.Cached {
+		t.Errorf("cache should be off by default; got a.Cached=%v b.Cached=%v", a.Cached, b.Cached)
 	}
 }
 

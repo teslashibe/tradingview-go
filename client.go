@@ -40,7 +40,7 @@ func New(cfg Config, log Logger) *Client {
 		pool: newConnPool(cfg, log),
 		http: &http.Client{Timeout: cfg.SearchTimeout + 5*time.Second},
 	}
-	if !cfg.DisableCache {
+	if cfg.EnableCache {
 		c.cache = newCache(cfg.CacheSize)
 	}
 	return c

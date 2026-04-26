@@ -12,10 +12,13 @@
 //   - SearchSymbols  free-text discovery against the public symbol-search REST endpoint
 //
 // Internally Client maintains a pool of authenticated WebSocket
-// connections (re-used across fetches) and a TTL cache keyed by
-// (symbol, resolution, bars). The cache is intentionally short-lived
-// so the agent never reasons over very stale data; see [DefaultConfig]
-// for the per-resolution TTL ladder.
+// connections (re-used across fetches). An optional TTL+LRU cache
+// keyed by (symbol, resolution, bars) is available but off by
+// default; flip [Config.EnableCache] on if duplicate fetches inside
+// a single reasoning turn become a problem or upstream rate limits
+// bite. The default — no cache — gives the freshest possible bars,
+// which matters for short-horizon trading where the live (unclosed)
+// candle is part of the signal.
 //
 // The default host is data.tradingview.com (anonymous, free). Point
 // [Config.Host] at prodata.tradingview.com if you have an authenticated
