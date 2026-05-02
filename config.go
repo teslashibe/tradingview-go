@@ -51,6 +51,10 @@ type Config struct {
 	// upstream rate limits.
 	EnableCache bool
 
+	// CandleHistory is the default bar count requested by Streamer.
+	// Default: 300.
+	CandleHistory int
+
 	// UserAgent is sent with WebSocket and REST requests. Default: a
 	// generic Mozilla string (TradingView rejects programmatic UAs).
 	UserAgent string
@@ -67,6 +71,7 @@ func DefaultConfig() Config {
 		IdleConnTimeout:  5 * time.Minute,
 		SearchTimeout:    10 * time.Second,
 		CacheSize:        256,
+		CandleHistory:    300,
 		CacheTTLs: map[string]time.Duration{
 			"1":   5 * time.Second,
 			"5":   15 * time.Second,
@@ -113,6 +118,9 @@ func (c Config) withDefaults() Config {
 	}
 	if c.CacheTTLs == nil {
 		c.CacheTTLs = d.CacheTTLs
+	}
+	if c.CandleHistory <= 0 {
+		c.CandleHistory = d.CandleHistory
 	}
 	if c.UserAgent == "" {
 		c.UserAgent = d.UserAgent

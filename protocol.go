@@ -9,13 +9,11 @@ package tradingview
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
 )
-
-var frameRegex = regexp.MustCompile(`~m~\d+~m~([^~]+|~h~\d+)`)
 
 // encodeFrame wraps a JSON message in TradingView's length-prefix frame.
 func encodeFrame(msg tvMessage) (string, error) {
@@ -29,12 +27,35 @@ func encodeFrame(msg tvMessage) (string, error) {
 // decodeFrames splits a raw WS message into its JSON / heartbeat parts.
 // TradingView batches multiple inner messages into one outer frame.
 func decodeFrames(raw string) []string {
-	matches := frameRegex.FindAllStringSubmatch(raw, -1)
-	out := make([]string, 0, len(matches))
-	for _, m := range matches {
-		if len(m) > 1 {
-			out = append(out, m[1])
+	var out []string
+	for len(raw) > 0 {
+		start := strings.Index(raw, "~m~")
+		if start == -1 {
+			break
 		}
+		raw = raw[start+3:]
+		end := strings.Index(raw, "~m~")
+		if end == -1 {
+			break
+		}
+		n, err := strconv.Atoi(raw[:end])
+		if err != nil {
+			break
+		}
+		raw = raw[end+3:]
+		if len(raw) < n {
+			if json.Valid([]byte(raw)) {
+				out = append(out, raw)
+			}
+			break
+		}
+		if n > 0 && raw[n-1] == '~' && strings.HasPrefix(raw[n:], "m~") {
+			out = append(out, raw[:n-1])
+			raw = raw[n-1:]
+			continue
+		}
+		out = append(out, raw[:n])
+		raw = raw[n:]
 	}
 	return out
 }
@@ -62,6 +83,9 @@ func heartbeatPong(raw string) (string, bool) {
 //	{ "sds_1": { "s": [ { "v": [ts, o, h, l, c, v] }, ... ] } }
 func parseCandles(payload map[string]any) []Candle {
 	var out []Candle
+	if nested, ok := payload["sds"].(map[string]any); ok {
+		payload = nested
+	}
 	for _, v := range payload {
 		series, ok := v.(map[string]any)
 		if !ok {
