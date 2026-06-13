@@ -1,11 +1,13 @@
 // Package tradingviewmcp exposes github.com/teslashibe/tradingview-go
 // as a set of mcptool.Tool values backing a single mcptool.Provider.
 //
-// Three tools cover the full surface:
+// The tool surface:
 //
 //   - tradingview_fetch_candles   single symbol, single resolution
 //   - tradingview_fetch_multi     single symbol, several resolutions in parallel
 //   - tradingview_search_symbols  free-text discovery against TradingView's REST endpoint
+//   - tradingview_analyze         multi-timeframe, multi-indicator TA (RSI/MACD/EMA/…)
+//   - tradingview_indicator       one indicator with custom params on one timeframe
 //
 // All tools take a *tradingview.Client and are safe to share across
 // concurrent MCP requests; the underlying client owns its WebSocket
@@ -28,8 +30,9 @@ func (Provider) Platform() string { return "tradingview" }
 // Tools returns every tradingview_* tool exposed by this provider.
 // Order is cosmetic; the host registry sorts by name.
 func (Provider) Tools() []mcptool.Tool {
-	out := make([]mcptool.Tool, 0, 3)
+	out := make([]mcptool.Tool, 0, 5)
 	out = append(out, fetchTools...)
 	out = append(out, searchTools...)
+	out = append(out, analyzeTools...)
 	return out
 }
