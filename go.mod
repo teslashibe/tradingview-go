@@ -3,6 +3,7 @@ module github.com/teslashibe/tradingview-go
 go 1.25.5
 
 require (
+	github.com/Bitvested/ta.go v0.20.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/mark3labs/mcp-go v0.54.0
 	github.com/teslashibe/mcptool v0.1.1
